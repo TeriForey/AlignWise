@@ -1,0 +1,43 @@
+  *---------*
+  | AlignFS |
+  *---------*
+
+AlignFS is designed to identify biologically relevant protein-coding regions whilst correcting for frame-shifts. It does this using homology, specifically BLAST searches and multiple alignments.
+
+** INSTALLATION **
+
+Simply install the required dependencies:
+
+ - MUSCLE (in PATH as 'muscle')
+ - BLAST+ (in PATH as 'blastx' and 'blastn')
+
+Perl Modules
+ - BioPerl
+ - Parallel::ForkManager
+
+Uncompress the BLAST databases:
+
+ $ tar xzf Blastdb.tar.gz
+
+[optional]
+To download additional BLAST databases, please visit our website at http://www.nottingham.ac.uk/~plzloose/phyloinc/
+
+** RUNNING INSTRUCTIONS ** 
+
+Simply type
+
+ $ ./AlignFS.pl [filename]
+
+To get help and further information on the running options:
+
+ $ ./AlignFS.pl -h
+
+** CONTACT AND CITATION **
+
+This work is in the process of being published.
+
+For any enquiries or bug reports please email teri.evans@nottingham.ac.uk
+
+
+
+
