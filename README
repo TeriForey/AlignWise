@@ -10,14 +10,9 @@ Simply install the required dependencies:
 
  - MUSCLE (in PATH as 'muscle')
  - BLAST+ (in PATH as 'blastx' and 'blastn')
-
 Perl Modules
  - BioPerl
  - Parallel::ForkManager
-
-Uncompress the BLAST databases:
-
- $ tar xzf Blastdb.tar.gz
 
 [optional]
 To download additional BLAST databases, please visit our website at http://www.nottingham.ac.uk/~plzloose/phyloinc/
