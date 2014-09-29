@@ -14,8 +14,6 @@ Perl Modules
  - BioPerl
  - Parallel::ForkManager
 
-[optional]
-To download additional BLAST databases, please visit our website at http://www.nottingham.ac.uk/~plzloose/phyloinc/
 
 ** RUNNING INSTRUCTIONS ** 
 
