@@ -2,7 +2,8 @@
   | AlignFS |
   *---------*
 
-AlignFS is designed to identify biologically relevant protein-coding regions whilst correcting for frame-shifts. It does this using homology, specifically BLAST searches and multiple alignments.
+AlignFS is designed to identify biologically relevant protein-coding regions whilst correcting for frame-shifts. It does this using homology, specifically BLAST searches and multiple alignments. It assumes that all frame-shifts located within the ORF to be sequencing errors that require correction. Use AlignFS with caution if this assumption is not true.
+
 
 ** INSTALLATION **
 
@@ -24,6 +25,7 @@ Simply type
 To get help and further information on the running options:
 
  $ ./AlignFS.pl -h
+
 
 ** CONTACT AND CITATION **
 
