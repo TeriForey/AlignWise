@@ -142,6 +142,7 @@ while (my $ori = $inseq->next_seq){
 	$counter++;
 	
 	if ($continue && exists $donehash->{$ori->display_id}){
+		$donecount++;
 		next;
 	}
 	
@@ -932,8 +933,8 @@ AlignFS.pl [options] [FASTA file]
  
  Options:
    -o [--ortho]          input file contains EST and orthologs
-   -p [--prot_db]        name of protein BLAST database. Default: prot_nr
-   -n [--nucl_db]        name of CDS BLAST database. Default: vert_cds
+   -p [--prot_db]        name of protein BLAST database. Default: ens_min_prot
+   -n [--nucl_db]        name of CDS BLAST database. Default: end_min_cds
    -v [--verbose]        running details, -v for limited, --verbose for full
    -r [--replace_stops]  replace STOP codons with 'X' (aa) and 'NNN' (nucl)
    -f [--force]          forces use of alignment to process EST
@@ -959,11 +960,11 @@ Input file contains EST and known orthologs, therefore no BLASTn is run as the o
 
 =item B<-p> [--prot_db]
 
-Full name and path of the protein BLAST database. Database should ideally contain non-redundant full length protein sequences from a range of species. Default: 'Blastdb/prot_nr'.
+Full name and path of the protein BLAST database. Database should ideally contain non-redundant full length protein sequences from a range of species. Default: 'Blastdb/ens_min_prot'.
 
 =item B<-n> [--nucl_db]
 
-Full name and path of the nucleotide CDS BLAST database. Database must have been indexed using the makeblastdb '-parse_seqids' command. Default: 'Blastdb/vert_cds'.
+Full name and path of the nucleotide CDS BLAST database. Database must have been indexed using the makeblastdb '-parse_seqids' command. Default: 'Blastdb/ens_min_cds'.
 
 =item B<-v> [--verbose]
 
