@@ -77,9 +77,15 @@ my $prot = $name . "_prot.fas";
 my $orfout = $name . "_orf.fas";
 my $annotfile = $name . "_blastx.xml";
 	
+my $lastone;
 my $donehash;
 if ($continue){ ## If file has already been semi-processed, find where it left off
 	
+	my $id = `tail -n 20 $orfout | grep ">" | head -n 1`;
+	chomp $id;
+	$id =~ s/ .*$//;
+	$id =~ s/^>//;
+	$lastone = $id;
 	open(TMP, $orfout);
 	while (my $line = <TMP>){
 		chomp $line;
@@ -141,9 +147,18 @@ my $inseq = Bio::SeqIO->new(-file => $file, -format => 'fasta');
 while (my $ori = $inseq->next_seq){
 	$counter++;
 	
-	if ($continue && exists $donehash->{$ori->display_id}){
+	if ($continue && $gotit == 0){
+		if ($ori->display_id eq $lastone){
+			$gotit++;
+		}
 		$donecount++;
 		next;
+	}
+	if ($continue && $gotit > 0){
+		if (exists $donehash->{$ori->display_id}){
+			$donecount++;
+			next;
+		}
 	}
 	
 	if ($isortho && $counter > 1){
