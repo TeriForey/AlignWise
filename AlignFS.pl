@@ -288,7 +288,7 @@ sub runprog {
 	}
 	print "Building alignment\n" if $verbose;
 	
-	system("muscle -in $newfile -out $aln -quiet");
+	system("muscle -in $newfile -out $aln -quiet -maxhours 0.5");
 	if (!-e $aln){
 		print "MUSCLE failed\n" if $verbose;
 		justprot($ori,$c);
