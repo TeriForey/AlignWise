@@ -142,6 +142,7 @@ if ($threads > 1){ # Set up the parallel fork manager
   	);
 }
 
+my $gotit = 0;
 #Read in the sequences
 my $inseq = Bio::SeqIO->new(-file => $file, -format => 'fasta');
 while (my $ori = $inseq->next_seq){
