@@ -76,6 +76,7 @@ $name =~ s/\.f.+$//;
 my $prot = $name . "_prot.fas";
 my $orfout = $name . "_orf.fas";
 my $annotfile = $name . "_blastx.xml";
+my $logfile = $name . "_log.txt";
 	
 my $lastone;
 my $donehash;
@@ -104,6 +105,9 @@ if ($continue){ ## If file has already been semi-processed, find where it left o
 	}
 	if (-e $annotfile){
 		system("rm $annotfile");
+	}
+	if (-e $logfile){
+		system("rm $logfile");
 	}
 }
 
@@ -210,6 +214,8 @@ sub runprog {
 	my $outntmp = $dir . "/" . $c . "blastnoutmp.txt";
 	my $aln = $dir . "/" . $c . "_aln.fas";
 	
+	my $log = $ori->display_id;
+	
 	if ($isortho){
 		$newfile = $file;
 	}
@@ -252,6 +258,8 @@ sub runprog {
 	
 	if ($end == 0 || $fail > 0){
 		print "No BLASTX hits\n" if $verbose;
+		$log .= "\tNo BLASTx hits";
+		writelog($log);
 		return;
 	}
 	
@@ -271,7 +279,9 @@ sub runprog {
 		my $seqcount = `grep -c ">" $newfile`;
 		if ($seqcount < $minorthos){
 			print "Not enough orthologous sequences\n" if $verbose;
+			$log .= "\ttop HSP used; not enough orthologs found";
 			justprot($ori,$c); # Takes just top HSP sequence
+			writelog($log);
 			return;
 		}
 	}else{
@@ -291,7 +301,9 @@ sub runprog {
 	system("muscle -in $newfile -out $aln -quiet -maxhours 0.5");
 	if (!-e $aln){
 		print "MUSCLE failed\n" if $verbose;
+		$log .= "\ttop HSP used; MUSCLE failed";
 		justprot($ori,$c);
+		writelog($log);
 		return;
 	}
 		
@@ -338,6 +350,7 @@ sub runprog {
 		print "%Identity: "  . $trunc->overall_percentage_identity . "\n" if $verbose && $verbose==2;
 		if (!$f && $trunc->overall_percentage_identity < $minpid){
 			print "Alignment has less than $minpid% overall identity\n" if $verbose;
+			$log .= "\ttop HSP used; Alignment <$minpid% overall identity";
 			$fail++;
 			last;
 		}
@@ -354,6 +367,7 @@ sub runprog {
 			print "Percent gaps: " . ($g/@chars)*100 . "\n" if $verbose && $verbose==2;
 			if (!$f && ($g/@chars)*100 > $maxgaps){
 				print "More than $maxgaps% gaps\n" if $verbose;
+				$log .= "\ttop HSP used; Alignment has more than $maxgaps% gaps";
 				$fail++;
 				last;
 			}
@@ -389,10 +403,12 @@ sub runprog {
 	}
 	if ($fail > 0){
 		justprot($ori,$c);
+		writelog($log);
 		return;
 	}
 	if ($gaps == 0 ){
 		print "No gaps found!\n" if $verbose;
+		$log .= "\tNo gaps in alignment";
 		my $reg = $tmp->trunc($sta,$end);
 		push(@seqs, $reg->seq);
 	}else{
@@ -400,9 +416,11 @@ sub runprog {
 		print "Have gaps which require processing\n" if $verbose;
 		@gaparray = sort {$a<=>$b} @gaparray;
 		GAPLOOP:{
+		$log = $ori->display_id;
 		my $a = 0;
 		if (@gaparray == 0){
 			print "No gaps found!\n" if $verbose && $verbose==2;
+			$log .= "\tNo consistent gaps in alignment";
 			my $reg = $tmp->trunc($sta,$end);
 			push(@seqs, $reg->seq);
 		}			
@@ -429,7 +447,10 @@ sub runprog {
 			if (!$f && $len > $maxlen){
 				print "Gap longer than $maxlen\n" if $verbose;
 				if ($hsp == 1 || $p < 50 || @seqs == 0){ # If the longest gap is close to the front of the BLASTx region, or there is only 1 HSP then we use the top HSP seq.
+					$log = $ori->display_id . "\ttop HSP used; gap is longer than $maxlen";
 					$fail++;
+				}else{
+					$log .= "\tORF ended at gap longer than " . $maxlen . "bp";
 				}
 				last; # Otherwise just end the ORF here
 			}
@@ -545,6 +566,9 @@ sub runprog {
 				my $newstr = substr($str,0,$gap-1) . substr($str,$gap+$len-1,$gend);
 				print "Result:  \t" . $newstr . "\n" if $verbose && $verbose==2;
 				push(@seqs, $newstr);
+				if ($len > 0){
+					$log .= "\t-$len";
+				}
 			}else{ # Gap was in EST, need to add bases
 				print "Need to add $len bases\n" if $verbose && $verbose==2;
 				print "Process:\t" . substr($str,0,$gap-1) if $verbose && $verbose==2;
@@ -557,6 +581,9 @@ sub runprog {
 				my $newstr = substr($str,0,$gap-1) . $insert . substr($str,$gap+$len-1,$gend);
 				print "Result:  \t" . $newstr . "\n" if $verbose && $verbose==2;
 				push(@seqs, $newstr);
+				if ($len > 0){
+					$log .= "\t+$len";
+				}
 			}
 			print "\n" if $verbose && $verbose==2;
 			$a++;
@@ -564,6 +591,7 @@ sub runprog {
 		} #end of GAPLOOP
 		if ($fail > 0){
 			justprot($ori,$c);
+			writelog($log);
 			return;
 		}
 	}
@@ -582,7 +610,7 @@ sub runprog {
 	}
 	
 	printseq($orf,$neg,$ori,$c); # Prints the sequence
-	
+	writelog($log);
 }
 
 
@@ -875,6 +903,16 @@ sub cat_annot{ #Print XML files out safely
 	print ANNOT "\n";
 	close(ANNOT);
 	close(IN);
+}
+
+sub writelog{
+	my $log = $_[0];
+	open(OUT, ">>$logfile");
+	if ($threads){
+		flock OUT, LOCK_EX;
+	}
+	print OUT $log . "\n";
+	close(OUT);
 }
 
 sub replace { # Replace STOP codons.
