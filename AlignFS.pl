@@ -347,6 +347,35 @@ sub runprog {
 		
 		# Truncate to that region
 		my $trunc = $a->slice($alnsta,$alnend);
+		
+		## truncate to new region if all homologs begin with ---ATG
+		my $seqstart;
+		my $go = 0;
+		my $t = 0;
+		foreach my $s ($trunc->each_seq){
+			if ($s->display_id ne $ori->display_id){
+				$t = length($s->seq);
+				if (!$seqstart){
+					if ($s->seq =~ /^(-+ATG)/){
+						$seqstart = $1;
+						$go++;
+					}else{
+						$seqstart = "O";
+					}
+				}else{
+					if ($s->seq =~ /^$seqstart/){
+						$go++;
+					}
+				}
+			}
+		}
+		if ($go == $minorthos-1){
+			print "Alignment starts with just gaps and ATG, will trim this region off\n" if $verbose && $verbose==2;
+			my $n = length($seqstart)-3;
+			$alnsta += $n;
+			$trunc = $a->slice($alnsta,$alnend);
+		}
+		
 		print "%Identity: "  . $trunc->overall_percentage_identity . "\n" if $verbose && $verbose==2;
 		if (!$f && $trunc->overall_percentage_identity < $minpid){
 			print "Alignment has less than $minpid% overall identity\n" if $verbose;
