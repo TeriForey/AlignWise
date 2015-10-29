@@ -2,7 +2,7 @@
   | AlignWise |
   *-----------*
 
-AlignWise is designed to identify biologically relevant protein-coding regions whilst correcting for frame-shifts. It does this using homology, specifically BLAST searches and multiple alignments, as well as the GeneWise algorithm. It assumes that all frame-shifts located within the ORF to be sequencing errors that require correction. Use AlignFS with caution if this assumption is not true.
+AlignWise is designed to identify biologically relevant protein-coding regions whilst correcting for frame-shifts. It does this using homology, specifically BLAST searches and multiple alignments, as well as the GeneWise algorithm. It assumes that all frame-shifts located within the ORF to be sequencing errors that require correction. Use AlignFS with caution if this assumption is not true. We do not recommend usign AlignWise on data generated from high-error sequencing methods, such as nanopore.
 
 
 ** INSTALLATION **
