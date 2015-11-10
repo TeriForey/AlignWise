@@ -30,7 +30,10 @@ To get help and further information on the running options:
 
 ** CONTACT AND CITATION **
 
-This work is in the process of being published.
+Please cite:
+AlignWise: a tool for identifying protein-coding sequence and correcting frame-shifts 
+Evans  T, Loose  M
+BMC Bioinformatics 2015, 16:376 (9 November 2015)
 
 For any enquiries or bug reports please email teri.evans@nottingham.ac.uk
 
